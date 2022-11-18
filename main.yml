@@ -1,0 +1,28 @@
+# Simple data transformation workflow
+name: KOF Economic Barometer
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  workflow_dispatch
+
+jobs:
+  oecd:
+    runs-on: ubuntu-latest
+    container: rocker/verse
+    steps:
+      - uses: actions/checkout@v3
+      - run: git version
+      - run: rm -rf README.md
+      - run: |
+          Rscript -e 'install.packages(c("kofdata","tsbox"))'
+          chmod +x demo_gha.R
+          ./demo_gha.R
+      - run: ls -lah
+      - run: |
+          git config --global --add safe.directory /__w/h4sci-gha-demo/h4sci-gha-demo
+          git config --global user.name "Matt Bannert"
+          git config --global user.email "mbannert@users.noreply.github.com"
+          git add figure README.md
+          git commit -m "Update README.md via GH Actions"
+          git push
